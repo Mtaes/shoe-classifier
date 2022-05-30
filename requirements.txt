@@ -1,0 +1,15 @@
+--extra-index-url https://download.pytorch.org/whl/cu113
+
+black[jupyter]
+isort
+matplotlib
+notebook
+numpy
+pandas
+Pillow
+pytorch-lightning
+scikit-learn
+seaborn
+torch
+torchmetrics
+torchvision
