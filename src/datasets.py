@@ -2,7 +2,9 @@ from pathlib import Path
 
 import numpy as np
 import torch
+from PIL import Image
 from torch.utils.data import Dataset
+from torchvision.datasets import ImageFolder
 
 
 class FashionMNISTDataset(Dataset):
@@ -21,3 +23,14 @@ class FashionMNISTDataset(Dataset):
 
     def __len__(self):
         return len(self.labels)
+
+
+def get_shoe_dataset(root: str):
+    return ImageFolder(
+        root,
+        loader=lambda path: torch.from_numpy(
+            np.asarray(Image.open(path), dtype=np.float32)
+        ).reshape((1, 28, 28))
+        / 255,
+        target_transform=lambda t: torch.tensor(t, dtype=torch.float32),
+    )

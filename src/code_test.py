@@ -5,8 +5,9 @@ from pathlib import Path
 
 import numpy as np
 import torch
+from PIL import Image
 
-from datasets import FashionMNISTDataset
+from datasets import FashionMNISTDataset, get_shoe_dataset
 from models import ShoeClassifier
 
 
@@ -64,6 +65,49 @@ class TestShoeClassifier(unittest.TestCase):
         with torch.no_grad():
             output = model(input_data)
         self.assertEqual(output.shape, (7, 1))
+
+
+class TestShoeDataset(unittest.TestCase):
+    def setUp(self):
+        self.data_path = tempfile.mkdtemp()
+        np.random.seed(42)
+        self.image = np.random.randint(low=0, high=256, size=(28, 28), dtype=np.uint8)
+        class_path = Path(self.data_path) / "class1"
+        class_path.mkdir()
+        with open(class_path / "image.png", mode="wb") as f:
+            Image.fromarray(self.image, mode="L").save(f)
+        self.image = self.image.reshape(1, 28, 28)
+
+    def tearDown(self):
+        shutil.rmtree(self.data_path)
+
+    def test_image_shape(self):
+        dataset = get_shoe_dataset(self.data_path)
+        image, _ = dataset[0]
+        self.assertEqual(image.shape, (1, 28, 28))
+
+    def test_image_values(self):
+        dataset = get_shoe_dataset(self.data_path)
+        image, _ = dataset[0]
+        example_image = (self.image.flatten().astype(np.float32) / 255).tolist()
+        self.assertEqual(example_image, image.flatten().tolist())
+
+    def test_image_dtype(self):
+        dataset = get_shoe_dataset(self.data_path)
+        image, _ = dataset[0]
+        self.assertTrue(type(image) is torch.Tensor)
+        self.assertEqual(image.dtype, torch.float32)
+
+    def test_target_value(self):
+        dataset = get_shoe_dataset(Path(self.data_path))
+        _, target = dataset[0]
+        self.assertEqual(target, 0)
+
+    def test_target_dtype(self):
+        dataset = get_shoe_dataset(Path(self.data_path))
+        _, target = dataset[0]
+        self.assertTrue(type(target) is torch.Tensor)
+        self.assertEqual(target.dtype, torch.float32)
 
 
 if __name__ == "__main__":
