@@ -131,3 +131,4 @@ dmypy.json
 data/fashion-mnist
 data/fashion-mnist-prep
 .vscode
+logs

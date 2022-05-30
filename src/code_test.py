@@ -7,6 +7,7 @@ import numpy as np
 import torch
 
 from datasets import FashionMNISTDataset
+from models import ShoeClassifier
 
 
 class TestFashionMNISTDataset(unittest.TestCase):
@@ -52,6 +53,17 @@ class TestFashionMNISTDataset(unittest.TestCase):
         _, target = dataset[0]
         self.assertTrue(type(target) is torch.Tensor)
         self.assertEqual(target.dtype, torch.float32)
+
+
+class TestShoeClassifier(unittest.TestCase):
+    def test_model_output(self):
+        torch.manual_seed(42)
+        input_data = torch.rand((7, 1, 28, 28))
+        model = ShoeClassifier()
+        model.eval()
+        with torch.no_grad():
+            output = model(input_data)
+        self.assertEqual(output.shape, (7, 1))
 
 
 if __name__ == "__main__":
