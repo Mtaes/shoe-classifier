@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import requests
 from sklearn.model_selection import train_test_split
 
 
@@ -16,8 +17,36 @@ def read_gzip(labels_path: Path, images_path: Path):
     return labels, images
 
 
+def download_files(root: Path):
+    root.mkdir(parents=True, exist_ok=True)
+    files = (
+        (
+            "train-images-idx3-ubyte.gz",
+            "http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-images-idx3-ubyte.gz",
+        ),
+        (
+            "train-labels-idx1-ubyte.gz",
+            "http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-labels-idx1-ubyte.gz",
+        ),
+        (
+            "t10k-images-idx3-ubyte.gz",
+            "http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/t10k-images-idx3-ubyte.gz",
+        ),
+        (
+            "t10k-labels-idx1-ubyte.gz",
+            "http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/t10k-labels-idx1-ubyte.gz",
+        ),
+    )
+    for f, url in files:
+        if not (root / f).is_file():
+            with open(root / f, "wb") as out_file:
+                content = requests.get(url, stream=True).content
+                out_file.write(content)
+
+
 if __name__ == "__main__":
     orig_data_path = Path("..") / "data" / "fashion-mnist"
+    download_files(orig_data_path)
     out_data_path = Path("..") / "data" / "fashion-mnist-prep"
     labels, images = read_gzip(
         orig_data_path / "train-labels-idx1-ubyte.gz",
