@@ -27,6 +27,7 @@ def get_dataloader(data: Dataset, args, shuffle: bool = False):
         num_workers=args.workers,
         pin_memory=True,
         shuffle=shuffle,
+        persistent_workers=True,
     )
 
 
