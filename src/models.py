@@ -12,21 +12,16 @@ class ShoeClassifier(pl.LightningModule):
         self.save_hyperparameters()
         self.lr = lr
         self.model = nn.Sequential(
-            nn.Conv2d(1, 24, 3),
+            nn.Conv2d(1, 8, 3),
             nn.LeakyReLU(),
             nn.MaxPool2d(2, 2),
-            nn.Conv2d(24, 48, 3),
-            nn.LeakyReLU(),
-            nn.MaxPool2d(2, 2),
-            nn.Conv2d(48, 64, 3),
+            nn.Conv2d(8, 12, 3),
             nn.LeakyReLU(),
             nn.MaxPool2d(2, 2),
             nn.Flatten(),
-            nn.Linear(64, 32),
+            nn.Linear(300, 32),
             nn.LeakyReLU(),
-            nn.Linear(32, 16),
-            nn.LeakyReLU(),
-            nn.Linear(16, 1),
+            nn.Linear(32, 1),
             nn.Sigmoid(),
         )
         metrics = MetricCollection(
@@ -48,8 +43,9 @@ class ShoeClassifier(pl.LightningModule):
     def _step(self, batch, metrics: MetricCollection):
         x, y = batch
         y_hat = self(x)
-        loss = self.loss(y_hat, y.reshape(-1, 1))
-        batch_metrics = metrics(y_hat, y.reshape(-1, 1).to(torch.int))
+        y_hat = y_hat.reshape(-1)
+        loss = self.loss(y_hat, y)
+        batch_metrics = metrics(y_hat, y.to(torch.int))
         batch_metrics = {f"batch_{key}": item for key, item in batch_metrics.items()}
         return loss, batch_metrics
 
