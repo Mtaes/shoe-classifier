@@ -58,3 +58,6 @@ Obtained model recognised correctly all images from the test split. Results are 
 
 ## Reproducibility
 To improve reproducibility of the results manual seeds were used in the code.
+
+## Tests
+Tests use `unittest` from the standard library and are included in the `src/code_test.py` file.
